@@ -57,14 +57,13 @@ var Engine = (function(global) {
          * function again as soon as the browser is able to draw another frame.
          */
         win.requestAnimationFrame(main);
-    };
+    }
 
     /* This function does some initial setup that should only occur once,
      * particularly setting the lastTime variable that is required for the
      * game loop.
      */
     function init() {
-        reset();
         lastTime = Date.now();
         main();
     }
@@ -80,12 +79,37 @@ var Engine = (function(global) {
      */
     function update(dt) {
         updateEntities(dt);
-        // checkCollisions();
+        checkCollisions();
+    }
+
+    function checkCollisions() {
+      // add 15 to account for the space between the start of the column and the
+      // actual player to make it look like the enemy is actually touching the player
+      var playerMinXPosition = player.x+15,
+          playerMaxXPosition = playerMinXPosition + 101;
+
+
+      allEnemies.forEach(function(enemy) {
+          // get the enemy right bounds
+          var enemyMaxXPosition = enemy.x + 101;
+
+          // is the player's left bounds less than the enemy's right bounds?
+          if((playerMinXPosition < enemyMaxXPosition) &&
+             // and is the enemy's right bounds less than the player's right bounds?
+             (enemyMaxXPosition < playerMaxXPosition) &&
+             // and is the player on the same row as the enemy?
+             (player.row === enemy.row))
+          {
+            // we have a colision, let's reset
+            reset();
+          }
+      });
     }
 
     /* This is called by the update function  and loops through all of the
      * objects within your allEnemies array as defined in app.js and calls
-     * their update() methods. It will then call the update function for your
+     * their update() methods. It will then render all the barriers in
+     * allBarriers. Lastly, it will then call the update function for your
      * player object. These update methods should focus purely on updating
      * the data/properties related to  the object. Do your drawing in your
      * render methods.
@@ -94,6 +118,7 @@ var Engine = (function(global) {
         allEnemies.forEach(function(enemy) {
             enemy.update(dt);
         });
+
         player.update();
     }
 
@@ -136,7 +161,6 @@ var Engine = (function(global) {
             }
         }
 
-
         renderEntities();
     }
 
@@ -146,21 +170,32 @@ var Engine = (function(global) {
      */
     function renderEntities() {
         /* Loop through all of the objects within the allEnemies array and call
-         * the render function you have defined.
+         * the render function
          */
         allEnemies.forEach(function(enemy) {
             enemy.render();
         });
 
+        /* Loop through all of the objects within the allBarriers array and call
+         * the render function
+         */
+        allBarriers.forEach(function(barrier) {
+            barrier.render();
+        });
+
+        // render the player
         player.render();
     }
 
-    /* This function does nothing but it could have been a good place to
-     * handle game reset states - maybe a new game menu or a game over screen
-     * those sorts of things. It's only called once by the init() method.
+    /*
+     * Reset the game both in Init() and when there is a player colision
      */
     function reset() {
-        // noop
+        player.reset();
+
+        allEnemies.forEach(function(enemy) {
+            enemy.reset();
+        });
     }
 
     /* Go ahead and load all of the images we know we're going to need to
@@ -172,7 +207,8 @@ var Engine = (function(global) {
         'images/water-block.png',
         'images/grass-block.png',
         'images/enemy-bug.png',
-        'images/char-boy.png'
+        'images/char-horn-girl.png',
+        'images/Rock.png'
     ]);
     Resources.onReady(init);
 
