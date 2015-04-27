@@ -23,7 +23,8 @@ var Engine = (function(global) {
         win = global.window,
         canvas = doc.createElement('canvas'),
         ctx = canvas.getContext('2d'),
-        lastTime;
+        lastTime,
+        WATER_ROW = 1;
 
     canvas.width = 505;
     canvas.height = 606;
@@ -80,6 +81,7 @@ var Engine = (function(global) {
     function update(dt) {
         updateEntities(dt);
         checkCollisions();
+        checkPlayerCompletedLevel();
     }
 
     function checkCollisions() {
@@ -120,6 +122,15 @@ var Engine = (function(global) {
         });
 
         player.update();
+    }
+
+    /* This function checks to see if the player has completed the level
+     * which essentially means that they have reached the water row.
+     */
+    function checkPlayerCompletedLevel() {
+        if(player.row === WATER_ROW) {
+          reset();
+        }
     }
 
     /* This function initially draws the "game level", it will then call
