@@ -1,1 +1,4 @@
-N/A
+I used the following references to create this game and readme:
+
+- Sample game: https://www.youtube.com/watch?v=p2JhGrrwLuQ
+- ReadMe help: http://docs.writethedocs.org/writing/beginners-guide-to-docs/
